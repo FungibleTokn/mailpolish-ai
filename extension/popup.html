@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MailPolish</title>
+  <style>
+    body { font: 14px system-ui; margin: 16px; min-width: 250px; }
+    label, input, button { display: block; margin-top: 8px; }
+    [hidden] { display: none; }
+    input { box-sizing: border-box; width: 100%; padding: 6px; }
+  </style>
+</head>
+<body>
+  <form id="sign-in" hidden>
+    <label for="invite">MailPolish invite key</label>
+    <input id="invite" type="password" autocomplete="off" required>
+    <button>Sign in</button>
+  </form>
+  <button id="sign-out" hidden>Sign out</button>
+  <p id="status" role="status"></p>
+  <script src="api-config.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

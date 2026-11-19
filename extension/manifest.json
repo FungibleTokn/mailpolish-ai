@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "MailPolish AI (Development)",
-  "version": "0.1.0",
+  "name": "MailPolish AI Beta",
+  "version": "0.2.0",
   "description": "One-click professional email rewrites inside Gmail.",
-  "permissions": [],
+  "permissions": [
+    "storage"
+  ],
   "host_permissions": [
-    "http://localhost:8000/*"
+    "https://mailpolish-ai-production.up.railway.app/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -22,5 +24,8 @@
         "styles.css"
       ]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
 }

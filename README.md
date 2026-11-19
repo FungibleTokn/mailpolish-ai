@@ -1,37 +1,23 @@
 # MailPolish AI
 
-Chrome extension prototype for one-click professional email rewrites in Gmail, backed by a FastAPI service using OpenAI.
+MailPolish rewrites Gmail drafts through a FastAPI backend and OpenAI.
 
-## Structure
-- `extension/` — Manifest V3 Gmail content script, toolbar, preview, and service worker
-- `backend/` — FastAPI rewrite endpoint
-- `dashboard/` — future account dashboard (not yet implemented)
+## Invite-only beta
 
-## Start backend
-Requires Python 3.11+ and an OpenAI API key.
+Each tester signs in through the Chrome extension popup with an individual invite key. Generate a key and its SHA-256 digest on a trusted device:
 
-```bash
-cd backend
-python -m venv .venv
-# macOS/Linux: source .venv/bin/activate
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-# Copy .env.example to .env and set OPENAI_API_KEY plus a unique MAILPOLISH_API_TOKEN
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```sh
+python -c "import hashlib, secrets; key = secrets.token_hex(32); print('Invite key:', key); print('SHA-256:', hashlib.sha256(key.encode()).hexdigest())"
 ```
 
-Verify `http://localhost:8000/health` returns `{"status":"ok"}`.
+Share each key with its tester through a private channel. Store only digests and stable, opaque account IDs in the backend's `MAILPOLISH_BETA_INVITES` variable, as a JSON object such as `{"<digest>":"tester-a"}`. Remove a digest to revoke a key. Keep the account ID when replacing a key so its quota history carries over.
 
-## Load extension in Chrome
-1. Copy `extension/config.example.js` to `extension/config.js`.
-2. Set `apiToken` in `config.js` to the same `MAILPOLISH_API_TOKEN` as the backend.
-3. Go to `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the `extension` directory.
-4. Open Gmail and compose a message. Click a MailPolish action, review the result, then choose **Replace draft** or **Copy**.
-5. Review the draft before sending. The extension never sends email.
+Use a single Railway replica and a persistent volume mounted at `/data`. Set `MAILPOLISH_USAGE_DB=/data/mailpolish-usage.sqlite3`, `OPENAI_API_KEY`, and optionally `OPENAI_MODEL` (default `gpt-4o-mini`) and `MAILPOLISH_DAILY_LIMIT` (default 20). The quota resets at midnight UTC. A request reserves a slot before calling OpenAI, including requests that fail upstream. The usage database stores account IDs, request counts, and token totals without storing drafts.
 
-## Security and limitations
-- **Local prototype only.** The extension development token is visible to anyone who has the extension. Do not distribute it or expose the backend publicly. Production requires per-user login, server-side quotas and rate limiting.
-- Email text is sent to the configured backend and OpenAI **only when a rewrite button is clicked**. The application does not persist draft bodies.
-- Gmail DOM selectors and replacement behavior are subject to change. Manual browser testing is required.
-- Billing, authentication, usage quotas, privacy policy, production deployment, and dashboard are not implemented.
-- API keys belong only in backend `.env`, never in the extension or repository.
+Deploy from `/backend` with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Keep all plaintext credentials out of the repository and extension bundle. The backend URL in the extension is set in `extension/api-config.js` and `extension/manifest.json`.
+
+Load `extension` as an unpacked Chrome extension. Open its popup, sign in with an invite key, refresh Gmail, and try a MailPolish action on a dummy draft. Chrome clears the extension session when the browser restarts. Draft text is sent to the backend and OpenAI when a rewrite is requested. The extension never sends email.
+
+## Local backend test
+
+With Python 3.11 or later, install `backend/requirements.txt`, then run `python backend/test_beta_flow.py` from the repository root. The test uses two generated keys, a temporary SQLite database, and a mocked OpenAI response.

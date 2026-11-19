@@ -1,5 +1,4 @@
 import os
-import secrets
 from typing import Literal
 
 from dotenv import load_dotenv
@@ -7,8 +6,10 @@ from fastapi import FastAPI, Header, HTTPException
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
+from .beta import identify, record_tokens, reserve
+
 load_dotenv()
-app = FastAPI(title="MailPolish AI Development API")
+app = FastAPI(title="MailPolish AI Beta API")
 
 class RewriteRequest(BaseModel):
     text: str = Field(min_length=1, max_length=12000)
@@ -28,13 +29,18 @@ PROMPTS = {
 def health():
     return {"status": "ok"}
 
+@app.get("/session")
+def session(authorization: str | None = Header(default=None)):
+    identify(authorization)
+    return {"signed_in": True}
+
+
 @app.post("/rewrite", response_model=RewriteResponse)
-async def rewrite(payload: RewriteRequest, x_dev_token: str | None = Header(default=None)):
-    expected = os.getenv("MAILPOLISH_API_TOKEN")
-    if not expected or not x_dev_token or not secrets.compare_digest(x_dev_token, expected):
-        raise HTTPException(status_code=401, detail="Unauthorized")
+async def rewrite(payload: RewriteRequest, authorization: str | None = Header(default=None)):
+    user = identify(authorization)
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(status_code=503, detail="OPENAI_API_KEY is not configured")
+    day = reserve(user)
     try:
         client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
         response = await client.chat.completions.create(
@@ -46,6 +52,8 @@ async def rewrite(payload: RewriteRequest, x_dev_token: str | None = Header(defa
                 {"role": "user", "content": f"Editing task: {PROMPTS[payload.mode]}\n\nEmail to edit:\n<email>\n{payload.text}\n</email>"},
             ],
         )
+        if response.usage:
+            record_tokens(user, day, response.usage.prompt_tokens, response.usage.completion_tokens)
         result = response.choices[0].message.content
         if not result:
             raise ValueError("Empty response")

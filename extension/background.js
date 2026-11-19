@@ -1,5 +1,5 @@
 // Extension service worker: host-permissioned API requests avoid Gmail page CORS restrictions.
-importScripts("config.js");
+importScripts("api-config.js");
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== "MAILPOLISH_REWRITE") return false;
   if (!sender.url?.startsWith("https://mail.google.com/")) {
@@ -14,9 +14,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   (async () => {
     try {
-      const response = await fetch(MAILPOLISH_CONFIG.apiUrl + "/rewrite", {
+      const { inviteKey } = await chrome.storage.session.get("inviteKey");
+      if (!inviteKey) throw new Error("Open the MailPolish extension to sign in.");
+      const response = await fetch(MAILPOLISH_API_URL + "/rewrite", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Dev-Token": MAILPOLISH_CONFIG.apiToken },
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + inviteKey },
         body: JSON.stringify({ text, mode })
       });
       const data = await response.json();
