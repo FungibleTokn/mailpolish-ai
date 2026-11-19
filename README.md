@@ -1,6 +1,6 @@
-# MailPolish AI
+# MailScribe
 
-MailPolish rewrites Gmail drafts through a FastAPI backend and OpenAI.
+MailScribe rewrites Gmail drafts through a FastAPI backend and OpenAI.
 
 ## Invite-only beta
 
@@ -16,7 +16,7 @@ Use a single Railway replica and a persistent volume mounted at `/data`. Set `MA
 
 Deploy from `/backend` with `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Keep all plaintext credentials out of the repository and extension bundle. The backend URL in the extension is set in `extension/api-config.js` and `extension/manifest.json`.
 
-Load `extension` as an unpacked Chrome extension. Open its popup, sign in with an invite key, refresh Gmail, and try a MailPolish action on a dummy draft. Chrome clears the extension session when the browser restarts. Draft text is sent to the backend and OpenAI when a rewrite is requested. The extension never sends email.
+Load `extension` as an unpacked Chrome extension. Open its popup, sign in with an invite key, refresh Gmail, and try a MailScribe action on a dummy draft. Chrome clears the extension session when the browser restarts. Draft text is sent to the backend and OpenAI when a rewrite is requested. The extension never sends email.
 
 ## Local backend test
 

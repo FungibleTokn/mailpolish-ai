@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     try {
       const { inviteKey } = await chrome.storage.session.get("inviteKey");
-      if (!inviteKey) throw new Error("Open the MailPolish extension to sign in.");
+      if (!inviteKey) throw new Error("Open the MailScribe extension to sign in.");
       const response = await fetch(MAILPOLISH_API_URL + "/rewrite", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + inviteKey },

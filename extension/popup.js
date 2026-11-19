@@ -20,7 +20,7 @@ form.addEventListener("submit", async event => {
       headers: { Authorization: "Bearer " + inviteKey }
     });
     if (response.status === 401) throw new Error("Invalid or revoked invite key.");
-    if (!response.ok) throw new Error("MailPolish is temporarily unavailable.");
+    if (!response.ok) throw new Error("MailScribe is temporarily unavailable.");
     await chrome.storage.session.set({ inviteKey });
     form.reset();
     showSession(true);

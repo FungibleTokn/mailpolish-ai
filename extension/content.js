@@ -22,7 +22,7 @@
     toolbar.className = "mp-toolbar";
     const status = document.createElement("span");
     status.className = "mp-status";
-    status.textContent = "MailPolish";
+    status.textContent = "MailScribe";
     toolbar.append(status);
 
     const preview = document.createElement("div");
@@ -90,7 +90,7 @@
     cancel.addEventListener("click", () => {
       preview.hidden = true;
       controls.hidden = true;
-      status.textContent = "MailPolish";
+      status.textContent = "MailScribe";
     });
 
     editor.parentElement.insertBefore(toolbar, editor);

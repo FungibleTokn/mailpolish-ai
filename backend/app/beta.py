@@ -11,7 +11,7 @@ from fastapi import HTTPException
 def identify(authorization: str | None) -> str:
     scheme, _, credential = (authorization or "").partition(" ")
     if scheme.lower() != "bearer" or len(credential) != 64:
-        raise HTTPException(401, "Sign in to MailPolish with your invite key.")
+        raise HTTPException(401, "Sign in to MailScribe with your invite key.")
     digest = hashlib.sha256(credential.encode()).hexdigest()
     invites = json.loads(os.getenv("MAILPOLISH_BETA_INVITES", "{}"))
     user = invites.get(digest)

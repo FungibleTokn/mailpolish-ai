@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from .beta import identify, record_tokens, reserve
 
 load_dotenv()
-app = FastAPI(title="MailPolish AI Beta API")
+app = FastAPI(title="MailScribe Beta API")
 
 class RewriteRequest(BaseModel):
     text: str = Field(min_length=1, max_length=12000)
