@@ -1,0 +1,7 @@
+.mp-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0; padding:8px; border:1px solid #d7dce2; border-radius:8px; background:#f8fafc; font:12px Arial,sans-serif; }
+.mp-toolbar button,.mp-preview-actions button { padding:6px 9px; border:1px solid #bdc5ce; background:#fff; border-radius:6px; cursor:pointer; font:12px Arial,sans-serif; }
+.mp-toolbar button:disabled { opacity:.5; cursor:wait; }
+.mp-status { font-weight:700; margin-right:5px; }
+.mp-preview { white-space:pre-wrap; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin:8px 0; background:#f8fafc; font:13px Arial,sans-serif; }
+.mp-preview-actions { display:flex; gap:6px; margin:6px 0; }
+.mp-preview[hidden],.mp-preview-actions[hidden] { display:none !important; }
