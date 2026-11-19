@@ -11,11 +11,15 @@
   </style>
 </head>
 <body>
-  <form id="sign-in" hidden>
+  <button id="google-sign-in" hidden>Sign in with Google</button>
+  <details id="existing-invite" hidden>
+  <summary>Use an existing invite key</summary>
+  <form id="sign-in">
     <label for="invite">MailScribe invite key</label>
     <input id="invite" type="password" autocomplete="off" required>
     <button>Sign in</button>
   </form>
+  </details>
   <button id="sign-out" hidden>Sign out</button>
   <p id="status" role="status"></p>
   <script src="api-config.js"></script>
