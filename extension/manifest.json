@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "MailPolish AI (Development)",
+  "version": "0.1.0",
+  "description": "One-click professional email rewrites inside Gmail.",
+  "permissions": [],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ]
+}
