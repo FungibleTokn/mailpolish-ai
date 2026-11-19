@@ -21,3 +21,9 @@ Load `extension` as an unpacked Chrome extension. Open its popup, sign in with a
 ## Local backend test
 
 With Python 3.11 or later, install `backend/requirements.txt`, then run `python backend/test_beta_flow.py` from the repository root. The test uses two generated keys, a temporary SQLite database, and a mocked OpenAI response.
+
+## Google sign-in setup
+
+Create a Google OAuth web application client. Register the backend URL ending in `/auth/google/callback` as its authorized redirect, then set `MAILSCRIBE_GOOGLE_REDIRECT_URI` to that exact URL. Set `MAILSCRIBE_CHROME_REDIRECT_URI` to `https://<extension-id>.chromiumapp.org/google` for the installed build. The Chrome Web Store assigns the store listing ID after the first upload. A staging build can use its own unpacked ID and Railway environment.
+
+Set the client ID and secret in `MAILSCRIBE_GOOGLE_CLIENT_ID` and `MAILSCRIBE_GOOGLE_CLIENT_SECRET`. Generate an independent random `MAILSCRIBE_AUTH_SECRET` of at least 32 characters. Store these values on the backend. The extension contains no OAuth client secret. Set `MAILSCRIBE_GOOGLE_ACCOUNTS` to a JSON object mapping lowercase invited Google email addresses to stable MailScribe account IDs. The app requests only Google identity and email scopes. Google sign-in sessions expire after eight hours. Existing invite keys remain usable during migration. Keep account IDs consistent across both methods to share usage quotas. The first successful Google sign-in binds the account ID to Google’s stable subject identifier. Reassigning a beta account to a different Google identity requires a new account ID.

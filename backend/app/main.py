@@ -6,10 +6,12 @@ from fastapi import FastAPI, Header, HTTPException
 from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 
-from .beta import identify, record_tokens, reserve
+from .beta import record_tokens, reserve
+from .google_login import identify_session, router as google_router
 
 load_dotenv()
 app = FastAPI(title="MailScribe Beta API")
+app.include_router(google_router)
 
 class RewriteRequest(BaseModel):
     text: str = Field(min_length=1, max_length=12000)
@@ -31,13 +33,13 @@ def health():
 
 @app.get("/session")
 def session(authorization: str | None = Header(default=None)):
-    identify(authorization)
+    identify_session(authorization)
     return {"signed_in": True}
 
 
 @app.post("/rewrite", response_model=RewriteResponse)
 async def rewrite(payload: RewriteRequest, authorization: str | None = Header(default=None)):
-    user = identify(authorization)
+    user = identify_session(authorization)
     if not os.getenv("OPENAI_API_KEY"):
         raise HTTPException(status_code=503, detail="OPENAI_API_KEY is not configured")
     day = reserve(user)

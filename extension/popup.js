@@ -1,14 +1,26 @@
+const google = document.querySelector("#google-sign-in");
 const form = document.querySelector("#sign-in");
+const existingInvite = document.querySelector("#existing-invite");
 const invite = document.querySelector("#invite");
 const submit = form.querySelector("button");
 const signOut = document.querySelector("#sign-out");
 const status = document.querySelector("#status");
 
 function showSession(signedIn) {
-  form.hidden = signedIn;
+  existingInvite.hidden = signedIn;
+  google.hidden = signedIn;
   signOut.hidden = !signedIn;
   status.textContent = signedIn ? "Signed in" : "";
 }
+
+google.addEventListener("click", async () => {
+  status.textContent = "Continue in the Google sign-in window.";
+  try {
+    await chrome.runtime.sendMessage({ type: "MAILSCRIBE_GOOGLE_SIGN_IN" });
+  } catch {
+    status.textContent = "Couldn’t open Google sign-in. Try again.";
+  }
+});
 
 form.addEventListener("submit", async event => {
   event.preventDefault();
@@ -32,8 +44,19 @@ form.addEventListener("submit", async event => {
 });
 
 signOut.addEventListener("click", async () => {
-  await chrome.storage.session.remove("inviteKey");
+  await chrome.storage.session.remove(["inviteKey", "sessionToken", "signInError"]);
   showSession(false);
 });
 
-chrome.storage.session.get("inviteKey").then(({ inviteKey }) => showSession(Boolean(inviteKey)));
+async function refreshSession() {
+  const { inviteKey, sessionToken, signInError } = await chrome.storage.session.get(
+    ["inviteKey", "sessionToken", "signInError"]
+  );
+  showSession(Boolean(inviteKey || sessionToken));
+  if (signInError) status.textContent = signInError;
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "session" && (changes.sessionToken || changes.signInError)) refreshSession();
+});
+refreshSession();
