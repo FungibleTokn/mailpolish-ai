@@ -1,0 +1,17 @@
+{
+  "name": "mailscribe-extension",
+  "private": true,
+  "version": "0.2.1",
+  "description": "MailScribe cross-browser extension build proof of concept",
+  "scripts": {
+    "dev:chrome": "extension dev --browser=chrome",
+    "build:chrome": "extension build --browser=chrome",
+    "build:edge": "extension build --browser=edge",
+    "build:firefox": "extension build --browser=firefox",
+    "build:safari": "extension build --browser=safari",
+    "package:chrome": "extension build --browser=chrome --zip"
+  },
+  "devDependencies": {
+    "extension": "^4.1.19"
+  }
+}
